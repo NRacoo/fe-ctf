@@ -72,8 +72,6 @@ export default function Taskbar({ windows, openWindow, activeWindow, toggleWindo
       {/* Window buttons */}
       <div className="flex-1 flex items-center gap-1 px-2">
         {windows.map((win) => {
-          console.log("taskbar", win)
-          console.log("taskbar active", activeWindow)
           if (!win.type) return null
           const Icon = windowIcons[win.type]
           const isActive = activeWindow === win.type && !win.isMinimized
