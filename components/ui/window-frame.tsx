@@ -9,6 +9,7 @@ interface WindowFrameProps {
   title: string
   children: ReactNode
   isActive: boolean
+  isMinimize: boolean
   position: { x: number; y: number }
   size: { width: number; height: number }
   zIndex: number
@@ -22,6 +23,7 @@ export default function WindowFrame({
   title,
   children,
   isActive,
+  isMinimize,
   position,
   size,
   zIndex,
@@ -63,6 +65,7 @@ export default function WindowFrame({
         top: position.y,
         width: size.width,
         zIndex,
+        display: isMinimize ? "none" : "block"
       }}
       onMouseDown={onFocus}
       onMouseMove={handleMouseMove}

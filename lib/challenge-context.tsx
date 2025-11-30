@@ -27,15 +27,21 @@ const ChallengesContext = createContext<ChallengesContextType | null>(null)
 export function ChallengesProvider({ children }: { children: ReactNode }) {
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [loading, setLoading] = useState(true)
-const api = process.env.NEXT_PUBLIC_API_URL
+  const api = process.env.NEXT_PUBLIC_API_URL
 
-  const { token } = useAuth()
+  const { token, isLoading } = useAuth()
 
   /** GET ALL CHALL */
   async function fetchChallenges() {
+   
     try {
       setLoading(true)
-      const res = await fetch(`${api}/challenges`)
+      const res = await fetch(`${api}/challenges`,{
+        headers:{
+          "Content-Type":"application/json",
+          Authorization:`Bearer ${token}`
+        }
+      })
 
       const data = await res.json()
       setChallenges(data.data ?? data)
@@ -122,8 +128,10 @@ const api = process.env.NEXT_PUBLIC_API_URL
     }
   }
   useEffect(() => {
-    fetchChallenges()
-  }, [])
+    if (!isLoading && token) {
+      fetchChallenges()
+    }
+  }, [token, isLoading])
 
   return (
     <ChallengesContext.Provider

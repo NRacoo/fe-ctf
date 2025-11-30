@@ -56,13 +56,14 @@ export default function WindowManager({
   return (
     <>
       {windows.map((win) => {
-        if (!win.type || win.isMinimized) return null
+        if (!win.type) return null
         const size = windowSizes[win.type]
         return (
           <WindowFrame
             key={win.type}
             title={windowTitles[win.type]}
             isActive={activeWindow === win.type}
+            isMinimize={win.isMinimized}
             position={win.position}
             size={size}
             zIndex={win.zIndex}

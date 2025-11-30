@@ -31,6 +31,9 @@ export default function ChallengesWindow() {
     setSubmit(null)
 
     const ok = await submitFlag(selectedChallenge.id, flagInput)
+    if(ok){
+      selectedChallenge.solved = true
+    }
     setSubmit(ok ? "correct" : "wrong")
     setLoading(false)
   }
@@ -91,9 +94,13 @@ export default function ChallengesWindow() {
                   type="text"
                   value={flagInput}
                   onChange={(e) => setFlagInput(e.target.value)}
+                  disabled = {selectedChallenge.solved}
                   className="w-full px-2 py-1.5 border border-[#a0a0a0] focus:border-[#3c7fb1] focus:outline-none text-sm font-mono"
                   placeholder="CPS{...}"
                 />
+                {selectedChallenge.solved && (
+                  <p className="text-green-600 w-full px-2 py-1.5 border border-[#a0a0a0] text-xs mt-1">✔ Challenge sudah disolve!</p>
+                )}
 
               {submit === "correct" && (
                 <p className="text-green-600 text-xs mt-1">✔ Flag Correct!</p>
@@ -103,13 +110,19 @@ export default function ChallengesWindow() {
               )}
               </div>
           <div className="p-3 border-t border-[#e0e0e0]">
-            <button 
-            onClick={handleSubmitFlag}
-            disabled={loading}
-            className="w-full px-3 py-1.5 bg-linear-to-b from-[#3c7fb1] to-[#2a5f91] text-white text-xs rounded border border-[#2a5f91] hover:from-[#4c8fc1] hover:to-[#3a6fa1] flex items-center justify-center gap-2">
+            <button
+              onClick={handleSubmitFlag}
+              disabled={loading || selectedChallenge.solved} 
+              className={`w-full px-3 py-1.5 text-white text-xs rounded border flex items-center justify-center gap-2
+                ${selectedChallenge.solved 
+                  ? "bg-gray-400 border-gray-400 cursor-not-allowed" 
+                  : "bg-linear-to-b from-[#3c7fb1] to-[#2a5f91] border-[#2a5f91] hover:from-[#4c8fc1] hover:to-[#3a6fa1]"
+                }`}
+            >
               <Flag className="w-3 h-3" />
-              {loading ? "checking" : "Submit Flag"}
+              {selectedChallenge.solved ? "Solved" : loading ? "Checking..." : "Submit Flag"}
             </button>
+
           </div>
         </div>
       )}

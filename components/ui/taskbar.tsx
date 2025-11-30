@@ -21,12 +21,13 @@ interface TaskbarProps {
   windows: WindowState[]
   openWindow: (type: WindowType) => void
   activeWindow: WindowType
+  toggleWindow: (type: WindowType) => void
+  focusWindow: (type: WindowType) => void
 }
 
 const windowIcons: Record<string, any> = {
   leaderboard: Trophy,
   challenges: Flag,
-  submit: Upload,
   about: HelpCircle,
   admin: Settings,
 }
@@ -34,12 +35,11 @@ const windowIcons: Record<string, any> = {
 const windowTitles: Record<string, string> = {
   leaderboard: "Leaderboard",
   challenges: "Challenges",
-  submit: "Submit Flag",
   about: "About CTF",
   admin: "Admin Panel",
 }
 
-export default function Taskbar({ windows, openWindow, activeWindow }: TaskbarProps) {
+export default function Taskbar({ windows, openWindow, activeWindow, toggleWindow, focusWindow }: TaskbarProps) {
   const { user, logout} = useAuth()
   const [time, setTime] = useState(new Date())
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -48,6 +48,18 @@ export default function Taskbar({ windows, openWindow, activeWindow }: TaskbarPr
     const timer = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
+
+  const handleTaskbarClick = (win: WindowState) => {
+    if (!win.type) return
+
+    if (win.isMinimized) {
+      toggleWindow(win.type)
+    } else if (activeWindow === win.type) {
+      toggleWindow(win.type)
+    } else {
+      focusWindow(win.type)
+    }
+  }
 
   return (
     <div className="h-10 bg-linear-to-b from-[#2d4f6e] to-[#1e3a52] border-t border-[#4a7aa8] flex items-center px-1">
@@ -60,13 +72,15 @@ export default function Taskbar({ windows, openWindow, activeWindow }: TaskbarPr
       {/* Window buttons */}
       <div className="flex-1 flex items-center gap-1 px-2">
         {windows.map((win) => {
+          console.log("taskbar", win)
+          console.log("taskbar active", activeWindow)
           if (!win.type) return null
           const Icon = windowIcons[win.type]
           const isActive = activeWindow === win.type && !win.isMinimized
           return (
             <button
               key={win.type}
-              onClick={() => openWindow(win.type)}
+              onClick={() => handleTaskbarClick(win)}
               className={`h-8 px-3 flex items-center gap-2 rounded-sm text-white text-xs transition-all min-w-[140px] max-w-[200px] ${
                 isActive
                   ? "bg-linear-to-b from-[#5a9ad5]/40 to-[#3a7ab5]/40 border border-[#8ac0e8]/50 shadow-inner"

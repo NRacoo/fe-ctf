@@ -1,48 +1,40 @@
-import { url } from 'inspector';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { jwtVerify } from 'jose';
+import { NextRequest } from 'next/server';
 
-export async function middleware(req: NextRequest) {
-  const token = req.cookies.get('access_token');
-  const {pathname} = req.nextUrl;
+export async function middleware(req : NextRequest) {
+  const token = req.cookies.get('token')?.value;
+  const userCookie = req.cookies.get('ctf_user')?.value;
+  const pathname = req.nextUrl.pathname;
 
-  const secret =new TextEncoder().encode(process.env.JWTSECRET)
-  if(!token){
-    return NextResponse.redirect(new URL('login', req.url))
-  }
-  
-  if (pathname.startsWith('/admin/dashboard')){
-    if(!token){
-        const url = req.nextUrl.clone()
-        url.pathname = '/admin'
-        return NextResponse.redirect(url)
-    }
-
+  let userRole = null;
+  if (userCookie) {
     try {
-        const { payload } = await jwtVerify(token.value, secret)
-        if(payload.role !== 'admin'){
-            const url = req.nextUrl.clone()
-            url.pathname = '/'
-            return NextResponse.redirect(url)
-        }
-        
-    } catch (error) {
-        console.error("Token Error:", error);
-        const url = req.nextUrl.clone();
-        url.pathname = '/admin';
-       
-        const response = NextResponse.redirect(url);
-        response.cookies.delete('access_token');
-        return response;
+      userRole = JSON.parse(userCookie).role;
+    } catch {}
+  }
+
+  // 1. Public pages
+  if (pathname === '/login' || pathname === '/admin/login') {
+    return NextResponse.next();
+  }
+
+  // 2. Require token for all other pages
+  if (!token) {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+
+  // 3. Admin pages require admin role
+  if (pathname.startsWith('/admin')) {
+    if (userRole !== 'admin') {
+      return NextResponse.redirect(new URL('/admin/login', req.url));
     }
   }
 
-
-  // Jika token ada, lanjutkan request
   return NextResponse.next();
 }
 
 export const config = {
-    matcher: [ "/admin/dashboard/:path*"]
-}
+  matcher: [
+    '/((?!login$|admin/login$|api|_next|favicon.ico).*)',
+  ],
+};

@@ -18,7 +18,6 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const { loginAdmin, register, userProfiles } = useAuth()
   const [mode, setMode] = useState<Mode>("select")
   const [selectedUser, setSelectedUser] = useState<string | null>(null)
-  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [username, setUsername] = useState("")
   const [error, setError] = useState("")
@@ -98,7 +97,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
       <div className="flex-1 flex items-center justify-center relative z-10">
         <div className="flex flex-col items-center">
           {/* User avatar */}
-          <div className="w-40 h-40 rounded-full bg-gradient-to-br from-[#4a90c2]/40 to-[#2d6da3]/40 border-4 border-[#4a90c2]/50 flex items-center justify-center mb-4 backdrop-blur-sm">
+          <div className="w-40 h-40 rounded-full bg-linear-to-b from-[#4a90c2]/40 to-[#2d6da3]/40 border-4 border-[#4a90c2]/50 flex items-center justify-center mb-4 backdrop-blur-sm">
             <User className="w-24 h-24 text-[#4a90c2]" strokeWidth={1} />
           </div>
 

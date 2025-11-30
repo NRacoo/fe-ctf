@@ -17,6 +17,7 @@ export default function LeaderboardWindow() {
   const [teams, setTeams] = useState<TeamScore[]>([])
   const [lastUpdate, setLastUpdate] = useState(new Date())
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [mounted, setMounted] = useState(false);
   const api = process.env.NEXT_PUBLIC_API_URL 
 
   const fetchInitData = async () =>{
@@ -64,6 +65,7 @@ export default function LeaderboardWindow() {
         setTeams(normalized);
         setLastUpdate(new Date())
     });
+    setMounted(true)
     return () => {
         socket.disconnect()
         socket.off("leaderboard_update")
@@ -109,7 +111,7 @@ export default function LeaderboardWindow() {
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-500 flex items-center gap-1">
             <Clock className="w-3 h-3" />
-            Updated: {lastUpdate.toLocaleTimeString("id-ID")}
+            Updated:{mounted ? lastUpdate.toLocaleTimeString("id-ID") : ""}
           </span>
           <button onClick={handleRefresh} className="win-btn flex items-center gap-1">
             <RefreshCw className={`w-3 h-3 ${isRefreshing ? "animate-spin" : ""}`} />

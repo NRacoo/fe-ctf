@@ -67,6 +67,24 @@ export default function Home() {
     }
   }
 
+  const toggleWindow = (type: WindowType) => {
+    const win = windows.find((w) => w.type === type)
+    if (!win) return
+
+    if (win.isMinimized) {
+      // Restore window
+      setWindows((prev) => prev.map((w) => (w.type === type ? { ...w, isMinimized: false, zIndex: maxZIndex + 1 } : w)))
+      setMaxZIndex((prev) => prev + 1)
+      setActiveWindow(type)
+    } else {
+      // Minimize window
+      setWindows((prev) => prev.map((w) => (w.type === type ? { ...w, isMinimized: true } : w)))
+      if (activeWindow === type) {
+        setActiveWindow(null)
+      }
+    }
+  }
+
   const bringToFront = (type: WindowType) => {
     setWindows((prev) => prev.map((w) => (w.type === type ? { ...w, zIndex: maxZIndex + 1 } : w)))
     setMaxZIndex((prev) => prev + 1)
@@ -77,27 +95,11 @@ export default function Home() {
     setWindows((prev) => prev.map((w) => (w.type === type ? { ...w, position } : w)))
   }
 
-  useEffect(() => {
-    if(!isLoading && !user){
-      router.replace("/login")
-    }
-  }, [user, isLoading, router])
-
-  if (isLoading) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-[#1e4d7b]">
-        <div className="text-white text-xl">{isLoading ? "Loading..." : "Redirecting to Login..."}</div>
-      </div>
-    )
-  }
-
-  if (!user) {
-    return <LoginScreen onLogin={() => {}} />
-  }
+  
 
   return (
     <main className="h-screen w-screen flex flex-col overflow-hidden bg-[#1e4d7b]">
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute pointer-events-none inset-0 flex items-center justify-center">
         <Image
         src={"/image/frame.svg"}
         alt="logo"
@@ -114,7 +116,7 @@ export default function Home() {
         onFocus={bringToFront}
         onUpdatePosition={updatePosition}
       />
-      <Taskbar windows={windows} openWindow={openWindow} activeWindow={activeWindow} />
+      <Taskbar windows={windows} openWindow={openWindow} activeWindow={activeWindow} focusWindow={bringToFront} toggleWindow={toggleWindow} />
     </main>
   )
 }

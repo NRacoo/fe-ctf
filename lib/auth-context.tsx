@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import Cookies from "js-cookie"
+import { useRouter } from "next/navigation"
 
 interface AuthContextType {
   user: any
@@ -26,6 +27,7 @@ export function AuthProvider({ children }: ProviderProps) {
   const [userProfiles, setUserProfiles] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const api = process.env.NEXT_PUBLIC_API_URL
+  const router = useRouter()
 
     async function login(username: string, password: string) {
         try {
@@ -43,7 +45,7 @@ export function AuthProvider({ children }: ProviderProps) {
 
         setToken(json.access_token)
         setUser(json.result)
-
+        console.log("users ", Cookies.set("ctf_user",JSON.stringify(json.result)))
         Cookies.set("ctf_user", JSON.stringify(json.result))
         Cookies.set("token", json.access_token)
 
@@ -105,6 +107,7 @@ export function AuthProvider({ children }: ProviderProps) {
         setToken(null)
         Cookies.remove("token")
         Cookies.remove("ctf_user")
+        router.push("/login")
     }
 
     async function fetchCurrentUser(token: string) {
